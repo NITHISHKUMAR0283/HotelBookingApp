@@ -82,40 +82,43 @@ class RoomInventory {
         inventory.put(roomType, updated);
     }
 
-    public void displayInventory() {
-        System.out.println("===== Room Inventory =====");
-        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
-            System.out.println(entry.getKey() + " - Available: " + entry.getValue());
-        }
-        System.out.println("==========================");
+    public Map<String, Integer> getAllAvailability() {
+        return new HashMap<>(inventory);
     }
 }
 
-public class HotelBookingApp {
+class RoomSearchService {
+    private RoomInventory inventory;
+
+    public RoomSearchService(RoomInventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public void searchAvailableRooms(Room[] rooms) {
+        System.out.println("===== Available Rooms =====");
+        for (Room room : rooms) {
+            int available = inventory.getAvailability(room.getName());
+            if (available > 0) {
+                room.displayInfo();
+                System.out.println("Availability: " + available);
+            }
+        }
+        System.out.println("===========================");
+    }
+}
+
+public class HotelBookingApp{
     public static void main(String[] args) {
         RoomInventory inventory = new RoomInventory();
         inventory.registerRoom("Single Room", 5);
         inventory.registerRoom("Double Room", 3);
-        inventory.registerRoom("Suite Room", 2);
+        inventory.registerRoom("Suite Room", 0);
 
-        Room single = new SingleRoom();
-        Room doubleRoom = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        Room[] rooms = { new SingleRoom(), new DoubleRoom(), new SuiteRoom() };
 
-        single.displayInfo();
-        System.out.println("Availability: " + inventory.getAvailability(single.getName()));
+        RoomSearchService searchService = new RoomSearchService(inventory);
+        searchService.searchAvailableRooms(rooms);
 
-        doubleRoom.displayInfo();
-        System.out.println("Availability: " + inventory.getAvailability(doubleRoom.getName()));
-
-        suite.displayInfo();
-        System.out.println("Availability: " + inventory.getAvailability(suite.getName()));
-
-        inventory.updateAvailability("Single Room", -1);
-        inventory.updateAvailability("Suite Room", 1);
-
-        inventory.displayInventory();
-
-        System.out.println("Application terminated.");
+        System.out.println("Search operation completed. Inventory unchanged.");
     }
 }
