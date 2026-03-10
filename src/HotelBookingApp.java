@@ -51,7 +51,7 @@ class BookingRequestQueue {
     }
 }
 
-public class UseCase5BookingRequestQueue {
+public class HotelBookingApp {
     public static void main(String[] args) {
         BookingRequestQueue queue = new BookingRequestQueue();
 
