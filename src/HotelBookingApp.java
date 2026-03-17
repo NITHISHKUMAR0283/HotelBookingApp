@@ -109,6 +109,53 @@ class BookingService {
     }
 }
 
+class AddOnService {
+    private String name;
+    private double cost;
+
+    public AddOnService(String name, double cost) {
+        this.name = name;
+        this.cost = cost;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+class AddOnServiceManager {
+    private Map<String, List<AddOnService>> serviceMap = new HashMap<>();
+
+    public void addService(String roomId, AddOnService service) {
+        serviceMap.putIfAbsent(roomId, new ArrayList<>());
+        serviceMap.get(roomId).add(service);
+    }
+
+    public double getTotalCost(String roomId) {
+        double total = 0;
+        List<AddOnService> list = serviceMap.get(roomId);
+        if (list != null) {
+            for (AddOnService s : list) {
+                total += s.getCost();
+            }
+        }
+        return total;
+    }
+
+    public void displayServices(String roomId) {
+        List<AddOnService> list = serviceMap.get(roomId);
+        if (list != null) {
+            for (AddOnService s : list) {
+                System.out.println(s.getName() + " - " + s.getCost());
+            }
+        }
+    }
+}
+
 public class HotelBookingApp {
     public static void main(String[] args) {
         BookingRequestQueue queue = new BookingRequestQueue();
@@ -116,14 +163,27 @@ public class HotelBookingApp {
         queue.addRequest(new Reservation("Alice", "Single Room"));
         queue.addRequest(new Reservation("Bob", "Double Room"));
         queue.addRequest(new Reservation("Charlie", "Suite Room"));
-        queue.addRequest(new Reservation("David", "Suite Room"));
 
         InventoryService inventory = new InventoryService();
         BookingService bookingService = new BookingService(inventory);
+        AddOnServiceManager addOnManager = new AddOnServiceManager();
+
+        List<Reservation> confirmed = new ArrayList<>();
 
         while (queue.hasRequests()) {
             Reservation r = queue.getNextRequest();
             bookingService.processRequest(r);
+            confirmed.add(r);
+        }
+
+        addOnManager.addService(confirmed.get(0).getRoomId(), new AddOnService("Breakfast", 500));
+        addOnManager.addService(confirmed.get(0).getRoomId(), new AddOnService("Spa", 1500));
+        addOnManager.addService(confirmed.get(1).getRoomId(), new AddOnService("Pickup", 800));
+
+        for (Reservation r : confirmed) {
+            System.out.println("Add-ons for " + r.getGuestName());
+            addOnManager.displayServices(r.getRoomId());
+            System.out.println("Total Add-on Cost: " + addOnManager.getTotalCost(r.getRoomId()));
         }
 
         bookingService.displayAllocations();
