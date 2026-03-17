@@ -22,6 +22,10 @@ class Reservation {
         this.roomId = roomId;
     }
 
+    public String getRoomId() {
+        return roomId;
+    }
+
     public void displayReservation() {
         System.out.println("Guest: " + guestName + ", Room Type: " + roomType + ", Room ID: " + roomId);
     }
@@ -105,7 +109,7 @@ class BookingService {
     }
 }
 
-public class UseCase6RoomAllocationService {
+public class HotelBookingApp {
     public static void main(String[] args) {
         BookingRequestQueue queue = new BookingRequestQueue();
 
